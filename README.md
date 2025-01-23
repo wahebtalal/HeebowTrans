@@ -17,12 +17,6 @@ You can install the package via composer:
 composer require wahebtalal/heebowtrans
 ```
 
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="heebowtrans-migrations"
-php artisan migrate
-```
 
 You can publish the config file with:
 
@@ -30,24 +24,14 @@ You can publish the config file with:
 php artisan vendor:publish --tag="heebowtrans-config"
 ```
 
-Optionally, you can publish the views using
 
-```bash
-php artisan vendor:publish --tag="heebowtrans-views"
-```
 
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
 
 ## Usage
 
-```php
-$heebowTrans = new Wahebtalal\HeebowTrans();
-echo $heebowTrans->echoPhrase('Hello, Wahebtalal!');
+```bash
+php artisan trans:extract {path to Folder or File} --locale={locale} --dry-run
+
 ```
 
 ## Testing
