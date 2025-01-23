@@ -12,7 +12,6 @@ class HeebowTransServiceProvider extends PackageServiceProvider
 {
     public static string $name = 'heebowtrans';
 
-
     public function configurePackage(Package $package): void
     {
         /*
@@ -34,15 +33,12 @@ class HeebowTransServiceProvider extends PackageServiceProvider
             $package->hasConfigFile();
         }
 
-
     }
 
     public function packageRegistered(): void {}
 
     public function packageBooted(): void
     {
-
-
 
         foreach (config('heebowtrans.include') as $class) {
             $class::configureUsing(function ($component) {
@@ -74,5 +70,4 @@ class HeebowTransServiceProvider extends PackageServiceProvider
             HeebowTransExtract::class,
         ];
     }
-
 }
