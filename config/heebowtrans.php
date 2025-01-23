@@ -28,6 +28,4 @@ return [
         \Filament\Infolists\Components\Entry::class,
     ],
 
-
-
 ];
