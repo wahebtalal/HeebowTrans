@@ -125,12 +125,13 @@ class HeebowTransExtract extends Command
         $values = [];
 
         // Use regex patterns from the configuration
-        $patterns = ["/(.+?)::make\\(['\"](.+?)['\"]\\)/"]; // config('heebowtrans.regex_patterns', []);
-
-        $include = config('heebowtrans.include', []);
+        $patterns = ["/(.+?)::make\\(['\"](.+?)['\"]\\)/"];
+        //        $patterns = ['/(?!\s*\/)(?!\s*#)(?!\s*\*).*?(.+?)::make\([\'\"](.+?)[\'\"]\)/'];
+        $include = config('heebow-trans-extract.include', []);
         foreach ($patterns as $pattern) {
             preg_match_all($pattern, $content, $matches);
             foreach ($matches[2] as $key => $value) {
+
                 if ($this->isClassOrParentIncluded($this->resolveClassName($matches[1][$key], $content), $include)) {
                     $values[] = (string) str($value)
                         ->afterLast('.')
@@ -148,12 +149,15 @@ class HeebowTransExtract extends Command
     /**
      * Check if a class or any of its parents or interfaces are in the include list.
      *
-     * @param  string  $className  The name of the class to check.
+     * @param  string|null  $className  The name of the class to check.
      * @param  array  $include  The array of included classes, parents, or interfaces.
      * @return bool True if the class or any of its parents/interfaces are in the include list, false otherwise.
      */
-    public function isClassOrParentIncluded(string $className, array $include): bool
+    public function isClassOrParentIncluded(?string $className, array $include): bool
     {
+        if (empty($className) || str_contains($className, '//')) {
+            return false;
+        }
         // Get parent classes and interfaces of the class
         $parentClasses = class_parents($className) ?: [];
         $interfaces = class_implements($className) ?: [];
@@ -166,13 +170,16 @@ class HeebowTransExtract extends Command
 
     private function resolveClassName(string $className, string $content): ?string
     {
-        // Remove spaces from class name
-        $className = str_replace(' ', '', $className);
+        // Trim and normalize the class name
+        $className = trim($className);
+        if (empty($className)) {
+            return null;
+        }
 
         // Escape the class name for use in a regex pattern
         $escapedClassName = preg_quote($className, '/');
 
-        // Match use statements to resolve the full class name
+        // Try to match 'use' statements for the full class name
         if (preg_match("/use\s+(.*?\\\\{$escapedClassName});/", $content, $match)) {
             return $match[1];
         }
@@ -180,10 +187,15 @@ class HeebowTransExtract extends Command
         // Check if the class is in the same namespace
         if (preg_match("/namespace\s+(.*?);/", $content, $namespaceMatch)) {
             $namespace = $namespaceMatch[1];
+            $fullyQualifiedName = "{$namespace}\\{$className}";
 
-            return "{$namespace}\\{$className}";
+            // Verify if the class actually exists
+            if (class_exists($fullyQualifiedName)) {
+                return $fullyQualifiedName;
+            }
         }
 
+        // Return null if the class cannot be resolved
         return null;
     }
 
