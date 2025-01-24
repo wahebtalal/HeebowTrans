@@ -204,14 +204,19 @@ class HeebowTransExtract extends Command
             $existingTranslations = json_decode(File::get($translationFilePath), true) ?? [];
         }
 
-        // Merge new values with existing translations
-        $newTranslations = array_fill_keys($values, ''); // Set empty values for new keys
-        $mergedTranslations = array_merge($existingTranslations, $newTranslations);
+        // Preserve existing translations and add new keys
+        $mergedTranslations = $existingTranslations;
+
+        foreach ($values as $key) {
+            if (!isset($mergedTranslations[$key])) {
+                $mergedTranslations[$key] = ''; // Add new keys with empty values
+            }
+        }
 
         // Sort translations alphabetically
         ksort($mergedTranslations);
 
-        if (! $dryRun) {
+        if (!$dryRun) {
             // Save the updated translations to the JSON file
             File::put($translationFilePath, json_encode($mergedTranslations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             $this->info("Translation file updated successfully: {$translationFilePath}");

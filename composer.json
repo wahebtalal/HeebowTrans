@@ -1,6 +1,8 @@
 {
     "name": "wahebtalal/heebowtrans",
     "description": "This is my package heebowtrans",
+    "version": "1.0.1",
+
     "keywords": [
         "wahebtalal",
         "laravel",
