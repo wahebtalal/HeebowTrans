@@ -208,7 +208,7 @@ class HeebowTransExtract extends Command
         $mergedTranslations = $existingTranslations;
 
         foreach ($values as $key) {
-            if (!isset($mergedTranslations[$key])) {
+            if (! isset($mergedTranslations[$key])) {
                 $mergedTranslations[$key] = ''; // Add new keys with empty values
             }
         }
@@ -216,7 +216,7 @@ class HeebowTransExtract extends Command
         // Sort translations alphabetically
         ksort($mergedTranslations);
 
-        if (!$dryRun) {
+        if (! $dryRun) {
             // Save the updated translations to the JSON file
             File::put($translationFilePath, json_encode($mergedTranslations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             $this->info("Translation file updated successfully: {$translationFilePath}");
